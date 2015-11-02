@@ -1,4 +1,3 @@
-<!DOCTYPEhtml>
 <HTML>
 <head>
 <title>Please buy our app. It's awesome. We think.</title>
@@ -26,4 +25,3 @@ Now I wonder what I was on to make me think I used PROJECT DRAGOONFLEE. <br> --T
 <h1> BUY NOW! </h1>
 </body>
 </HTML>
-</!DOCTYPEhtml>
