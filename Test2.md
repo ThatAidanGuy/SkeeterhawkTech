@@ -1,9 +1,7 @@
 <HTML>
 <head>
 <style>
-h1 {
-color:purple;
-}
+h1 {color:purple;}
 </style>
 </head>
 <body>
