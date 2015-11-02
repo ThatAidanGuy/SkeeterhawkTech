@@ -1,10 +1,11 @@
 <HTML>
 <head>
 <style>
-<h1 {
+h1 {
 color:purple;
-}>
+}
 </style>
+</head>
 <body>
 <h1>
 The <strong> NEWEST </strong> and the <strong> BEST </strong> in the app business! </h1>
