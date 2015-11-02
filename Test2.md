@@ -1,7 +1,10 @@
 <HTML>
 <head>
-<title>Please buy our app. It's awesome. We think.</title>
-</head>
+<style>
+<h1 {
+color:purple;
+}>
+</style>
 <body>
 <h1>
 The <strong> NEWEST </strong> and the <strong> BEST </strong> in the app business! </h1>
