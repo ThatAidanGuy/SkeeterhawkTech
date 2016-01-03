@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+  <html lang= en>
+  <html>
+  <head>
+  <title>ScheduleLife</title>
+  <style>
+  table {
+     width: 100%;
+     border: 1px solid blue;
+  }
+
+  td {
+     width: 25%;
+     border: 1px solid black;
+  }
+
+  td.active {
+  background-color: green
+  }
+  </style>
+   <script src="https://code.jquery.com/jquery-1.11.3.min.js">
+   </script>
+  </head>
+  <body>
+  <table>
+  <thead>
+  </thead>
+   <tbody>
+  <tr class="user-row">
+     <td>You
+     </td>
+     <td>Event 1
+     </td>
+     <td>Event 2
+     </td>
+     <td>Event 3
+     </td>
+  </tr>
+  <tr class="friend-row">
+     <td class="avatar"> Friend 1
+     </td>
+     <td class="time"> x
+     </td>
+     <td class="time"> x
+     </td>
+     <td class="time"> x
+     </td>
+  </tr>
+  <tr class="friend-row">
+     <td class="avatar"> Friend 2
+     </td>
+     <td class="time"> x
+     </td>
+     <td class="time"> x
+     </td>
+     <td class="time"> x
+     </td>
+  </tr>
+  <tr class="friend-row">
+     <td class="avatar"> Friend 3
+     </td>
+     <td class="time"> x
+     </td>
+     <td class="time"> x
+     </td>
+     <td class="time"> x
+     </td>
+  </tr>
+  </tbody>
+  </table>
+   <script>
+   $( document ).ready(function() {
+   $("tr.friend-row td.time").click(function () {
+     console.log($(this))
+     var $el = $(this);
+     $el.toggleClass("active")
+   })
+});
+   </script>
