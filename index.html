@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+  <html lang= en>
+  <html>
+  <head>
+  <title>ScheduleLife</title>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.1/css/bootstrap-datepicker3.min.css">
+
+  <style>
+  h1 {
+    text-align: center;
+  }
+  .page {
+    margin: 45px;
+
+
+  }
+  table.table {
+    width: 100%
+  }
+
+  td {
+     max-width: 25%;
+  }
+
+  td.attending {
+  background-color: green
+  }
+  .table-buttons {
+    margin-bottom: 15px;
+  }
+  .cf:before,
+.cf:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.cf:after {
+    clear: both;
+}
+  .date-select-button {
+    float: left;
+    width: 150px;
+  }
+  .event-modal-button {
+    float: right;
+  }
+  </style>
+   <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+   <script src="bootstrap-datepicker.js"></script>
+  </head>
+  <body>
+    <div class="page">
+    <h1>ScheduleLife</h1>
+    <div class="table-buttons cf">
+      <button type="button" class="btn btn-default event-modal-button" data-toggle="modal" data-target="#myModal">Add Event</button>
+      <div class="input-group date date-select-button">
+          <input type="text" class="form-control">
+          <div class="input-group-addon">
+              <span class="glyphicon glyphicon-th"></span>
+          </div>
+      </div>
+
+  </div>
+    <div class="table-container"></div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Add Event</h4>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="eventname ">Event Name</label>
+              <input type="text" class="form-control" id="eventname" placeholder="Event name">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary add-event-button">Add Event</button>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+   <script>
+   $( document ).ready(function() {
+     var selectedDate = new Date().toDateString();
+
+     var friends = [
+       {name: 'Friend 1', id: 1},
+       {name: 'Friend 2', id: 2},
+       {name: 'Friend 3', id: 3}
+     ]
+     var events = [
+       {id: 0, title: 'Event 1', attendees:[1], date: selectedDate},
+       {id: 1, title: 'Event 2', date: selectedDate},
+       {id: 2, title: 'Event 3', date: selectedDate}
+     ]
+
+     if (localStorage.getItem('scheduleLifeEvents')) {
+       events = JSON.parse(localStorage.getItem('scheduleLifeEvents'))
+    } else {
+       localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+    }
+
+     function getEventsByDate (eventsArray, eventDate) {
+       var filteredEvents = [];
+       for (var x = 0; x < eventsArray.length; x++){
+        var event = eventsArray[x];
+        if (event.date === eventDate) {
+          filteredEvents.push(event)
+        }
+       }
+       return filteredEvents;
+     }
+
+     function getEventByID (id) {
+       for (var x = 0; x < events.length; x++){
+        if (events[x].id === id) {
+          return events[x]
+        }
+       }
+     }
+
+    function drawTable () {
+       var filteredEvents = getEventsByDate(events, selectedDate);
+       var $table = $('<table class="table table-bordered events-table"></table>')
+
+       var $userRow = $('<tr class="user-row"><td>You</td></tr>');
+       for (var x = 0; x < filteredEvents.length; x++){
+         var cellHTML = '<td class="time">' + filteredEvents[x].title +'</td>';
+         var $cell = $(cellHTML);
+         $userRow.append($cell)
+       }
+
+       $table.append($userRow)
+
+       for (var i = 0; i < friends.length; i++) {
+         var friendName = friends[i].name;
+         var friendID = friends[i].id;
+         var $friendRow = $('<tr class="friend-row"><td>' + friendName + '</td></tr>');
+
+         for (var x = 0; x < filteredEvents.length; x++){
+           var event = filteredEvents[x];
+           var cellClass = "time";
+           var attendees = event.attendees || [];
+           if (attendees.indexOf(friendID) > -1) {
+             cellClass += " attending";
+           }
+           var cellHTML = '<td class="' + cellClass + '" data-friend=' + friendID + ' data-event='+ event.id +'></td>';
+           $friendRow.append($(cellHTML))
+         }
+         $table.append($friendRow)
+       }
+      $('.table-container').html($table)
+    }
+
+
+     $(".table-container").on("click", "tr.friend-row td.time", function (e) {
+       var thingThatWasClicked = $(e.target);
+
+       var friendID = thingThatWasClicked.data('friend')
+       var eventID = thingThatWasClicked.data('event');
+       var event = getEventByID(eventID);
+
+       if (!event.attendees) {
+         event.attendees = [];
+       }
+
+       if (thingThatWasClicked.hasClass("attending")) {
+         thingThatWasClicked.removeClass("attending")
+         var attendee = event.attendees.indexOf(friendID);
+         event.attendees.splice(attendee, 1)
+       }else {
+         thingThatWasClicked.addClass("attending");
+         if (event.attendees.indexOf(friendID) < 0) {
+           event.attendees.push(friendID)
+         }
+       }
+
+       localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+     })
+
+     $(".add-event-button").on("click", function () {
+       // get event data
+       var eventName = $('#myModal #eventname').val();
+       // hack to get a unique id
+       var id = new Date().getTime();
+       events.push({id: id, title: eventName, date:selectedDate});
+       drawTable();
+       localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+       $('#myModal #eventname').val('');
+       $('#myModal').modal('hide')
+
+       // get all the event table rows
+       //var tableRows = $('.events-table tr');
+       // go through all the table rows
+       //for (var i = 0; i < tableRows.length; i++) {
+           //var $row = $(tableRows[i]);
+           //if ($row.hasClass('user-row')) {
+             //var cellHTML = '<td class="time">' + eventName + '</td>';
+           //} else {
+             //var cellHTML = '<td class="time">x</td>';
+           //}
+           //var $cell = $(cellHTML);
+           //$row.append($cell)
+       //}
+     });
+     $('.date-select-button').datepicker(
+       {
+         autoclose: true,
+         clearBtn: true,
+         todayHighlight: true
+       }
+     ).on('changeDate', function(e) {
+        selectedDate = new Date(e.date).toDateString();
+        drawTable();
+     });
+
+     $('.date-select-button').datepicker('setDate', selectedDate)
+   });
+   </script>
+ </body>
+ </html>
