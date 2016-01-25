@@ -45,6 +45,15 @@
   .add-buttons {
     float: right;
   }
+.remove-friend,
+.remove-event {
+  padding-left: 5px;
+  position: relative;
+  top: 2px;
+  cursor: pointer;
+  color: #a94442;
+}
+
   </style>
    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -114,25 +123,58 @@
     </div>
     </div>
   </div>
+
+
+  <div class="modal fade" id="removeFriend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog bs-example-modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Remove Friend</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to remove this friend?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary remove-friend-modal-button">Remove Friend</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div class="modal fade" id="removeEvent" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <h4 class="modal-title" id="myModalLabel">Remove Event</h4>
+    </div>
+    <div class="modal-body">
+      <p>Are you sure you want to remove this event?</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      <button type="button" class="btn btn-primary remove-event-modal-button">Remove Event</button>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
    <script>
    $( document ).ready(function() {
      var selectedDate = new Date().toDateString();
-
-     var friends = [
-       {name: 'Friend 1', id: 1},
-       {name: 'Friend 2', id: 2},
-       {name: 'Friend 3', id: 3}
-     ]
-     var events = [
-       {id: 0, title: 'Event 1', attendees:[1], date: selectedDate},
-       {id: 1, title: 'Event 2', date: selectedDate},
-       {id: 2, title: 'Event 3', date: selectedDate}
-     ]
+     var friends = [];
+     var events = [];
 
      if (localStorage.getItem('scheduleLifeEvents')) {
        events = JSON.parse(localStorage.getItem('scheduleLifeEvents'))
-    } else {
-       localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+     }
+
+    if (localStorage.getItem('scheduleLifeFriends')) {
+      friends = JSON.parse(localStorage.getItem('scheduleLifeFriends'))
     }
 
      function getEventsByDate (eventsArray, eventDate) {
@@ -146,10 +188,10 @@
        return filteredEvents;
      }
 
-     function getEventByID (id) {
-       for (var x = 0; x < events.length; x++){
-        if (events[x].id === id) {
-          return events[x]
+     function getItemByID (arr, id) {
+       for (var x = 0; x < arr.length; x++){
+        if (arr[x].id === id) {
+          return {ind: x, item: arr[x]}
         }
        }
      }
@@ -170,7 +212,11 @@
 
        var $userRow = $('<tr class="user-row"><td>You</td></tr>');
        for (var x = 0; x < filteredEvents.length; x++){
-         var cellHTML = '<td class="time">' + filteredEvents[x].title +'</td>';
+         var cellHTML = '<td class="time">' +
+                          filteredEvents[x].title +
+                          '<span class="glyphicon glyphicon-remove-circle remove-event" data-event="' + filteredEvents[x].id + '">' +
+                          '</span>' +
+                        '</td>';
          var $cell = $(cellHTML);
          $userRow.append($cell)
        }
@@ -180,7 +226,13 @@
        for (var i = 0; i < friends.length; i++) {
          var friendName = friends[i].name;
          var friendID = friends[i].id;
-         var $friendRow = $('<tr class="friend-row"><td>' + friendName + '</td></tr>');
+         var $friendRow = $('<tr class="friend-row">' +
+                              '<td>' +
+                                friendName +
+                                '<span class="glyphicon glyphicon-remove-circle remove-friend" data-friend="' + friendID + '">' +
+                                '</span>' +
+                              '</td>' +
+                            '</tr>');
 
          for (var x = 0; x < filteredEvents.length; x++){
            var event = filteredEvents[x];
@@ -203,7 +255,7 @@
 
        var friendID = thingThatWasClicked.data('friend')
        var eventID = thingThatWasClicked.data('event');
-       var event = getEventByID(eventID);
+       var event = getItemByID(events, eventID).item;
 
        if (!event.attendees) {
          event.attendees = [];
@@ -233,20 +285,6 @@
        localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
        $('#myModal #eventname').val('');
        $('#myModal').modal('hide')
-
-       // get all the event table rows
-       //var tableRows = $('.events-table tr');
-       // go through all the table rows
-       //for (var i = 0; i < tableRows.length; i++) {
-           //var $row = $(tableRows[i]);
-           //if ($row.hasClass('user-row')) {
-             //var cellHTML = '<td class="time">' + eventName + '</td>';
-           //} else {
-             //var cellHTML = '<td class="time">x</td>';
-           //}
-           //var $cell = $(cellHTML);
-           //$row.append($cell)
-       //}
      });
 
      $(".add-friend-button").on("click", function () {
@@ -256,10 +294,63 @@
        var id = new Date().getTime();
        friends.push({id: id, name: friendName});
        drawTableOrMessage();
-       localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+       localStorage.setItem('scheduleLifeFriends', JSON.stringify(friends))
        friendNameInput.val('');
        $('#friendModal').modal('hide')
      });
+
+     $(".table-container").on('click', '.remove-event', function (e) {
+       var eventID = $(e.target).data('event');
+       var obj =  getItemByID(events, eventID);
+       var event = obj.item;
+       var eventIndex = obj.ind;
+       var eventName = event.title;
+       $('#removeEvent')
+          .find('.modal-body')
+          .html('<p>Are you sure you want to remove <em>' + eventName + '</em>?</p>');
+       $('#removeEvent').modal('show');
+
+       $(".remove-event-modal-button").on("click", function () {
+         events.splice(eventIndex, 1)
+         drawTableOrMessage();
+         localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+         $('#removeEvent').modal('hide')
+       });
+     });
+
+     $(".table-container").on('click', '.remove-friend', function (e) {
+       var friendID = $(e.target).data('friend');
+       var obj =  getItemByID(friends, friendID);
+       var friend = obj.item;
+       var friendIndex = obj.ind;
+       var friendName = friend.name;
+       $('#removeFriend')
+          .find('.modal-body')
+          .html('<p>Are you sure you want to remove <em>' + friendName + '</em>?</p>');
+       $('#removeFriend').modal('show');
+
+       $(".remove-friend-modal-button").on("click", function () {
+         friends.splice(friendIndex, 1);
+         drawTableOrMessage();
+         removeFriendFromEvents(friendID);
+         localStorage.setItem('scheduleLifeFriends', JSON.stringify(friends))
+         localStorage.setItem('scheduleLifeEvents', JSON.stringify(events))
+         $('#removeFriend').modal('hide')
+         console.log(events)
+       });
+     });
+
+     function removeFriendFromEvents (friendID) {
+       for (var e = 0; e < events.length; e++) {
+           var attendees = events[e].attendees || [];
+           for (var i = 0; i < attendees.length; i++) {
+             if (attendees[i] == friendID) {
+               attendees.splice(i, 1);
+             }
+           }
+       }
+     }
+
 
      $('.date-select-button').datepicker(
        {
