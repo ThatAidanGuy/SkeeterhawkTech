@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+  <html lang = en>
+    <html>
+<!-- Updated at 5:49PM on Tuesday, June 21, 2016. -->
+      <head>
+        <title> Recurring events tool: Beta version </title>
+<!-- NOTE TO SELF: Move css into a separate file later -->
+<!-- OTHER NOTE TO SELF: Also, ADD CSS -->
+        <style>
+          body {
+            text-align: center;
+            font-family: Verdana;
+          }
+          
+          span {
+            font-family: Courier;
+            color: gray;
+          }
+        </style>
+        <script src = "https://code.jquery.com/jquery-1.11.3.min.js"> </script>
+        <script src = "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js> </script>
+        <script src = "bootstrap-datepicker.js"> </script>
+      </head>
+      <body>
+        <h1> Recurring Events Tool </h1>
+        <h3> The Beta Version </h3>
+        <br> <br> <br> <br>
+        <p>  <b> Welcome to the <span> RECURRING EVENTS TOOL </span>!  
+        This is a tool designed for scheduling recurring events in an in-depth way.  
+        You can set the date of an event, be it a day of the week or of the month!  
+        You can also highlight days, weeks, or months in which an event will <i> not </i>occur!  
+        All this, you can do with the <span> RECURRING EVENTS TOOL </span> </b>! </p>
+        <h5> (At least, you can once it's complete.) </h5>
+        
+<!-- Now for the calendar! -->
+        <script>
